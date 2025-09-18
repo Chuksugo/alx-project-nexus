@@ -1,237 +1,293 @@
-# 🛒 ALX Project Nexus – E-commerce Django API (Backend Documentation)
+# ProDev BE — E-Commerce Backend
 
-## 📑 Table of Contents
-- [Overview](#-overview)
-- [Project Objective](#-project-objective)
-- [Major Learnings](#-major-learnings)
-  - [Key Technologies](#-key-technologies)
-  - [Backend Development Concepts](#-backend-development-concepts)
-- [System Architecture](#-system-architecture)
-- [Database Design](#-database-design)
-- [Challenges & Solutions](#-challenges--solutions)
-- [Best Practices & Takeaways](#-best-practices--takeaways)
-- [Repository Setup](#-repository-setup)
-- [References](#-references)
+An **E-Commerce Backend** project built with Django and PostgreSQL, simulating a real-world development environment with emphasis on **scalability, security, and performance**.
+
+This backend provides APIs for product catalog management, user authentication, and product discovery features like filtering, sorting, and pagination. It also demonstrates database optimization techniques for high-performance queries.
 
 ---
 
-## 📌 Overview
-This repository, **`alx-project-nexus`**, serves as the documentation hub for my learnings and implementation in the **ProDev Backend Engineering Program**.  
+## 🚀 Features
 
-The focus project is a **scalable E-commerce Django API**, designed to demonstrate mastery of backend technologies, concepts, and industry best practices.
+### 1. CRUD Operations
 
----
+* Manage **Products** and **Categories** (Create, Read, Update, Delete).
+* User authentication and management via **JWT tokens**.
 
-## 🎯 Project Objective
-- Consolidate key backend learnings from the program  
-- Document major technologies, concepts, challenges, and solutions  
-- Provide a reference guide for backend development best practices  
-- Showcase system architecture and database design for an e-commerce API  
+### 2. API Features
 
----
+* **Filtering & Sorting**: Filter products by category, price range, and search terms.
+* **Pagination**: Efficiently paginate product listings for large datasets.
+* **Secure Authentication**: JWT-based login and refresh.
 
-## 🎯 Major Learnings
+### 3. API Documentation
 
-### 🔑 Key Technologies
-- **Python** – Core programming language  
-- **Django** – Web framework for building scalable backend applications  
-- **Django REST Framework (DRF)** – RESTful API development  
-- **GraphQL** – Alternative query language for APIs  
-- **Docker** – Containerization and environment consistency  
-- **CI/CD (GitHub Actions)** – Automated testing and deployment pipelines  
+* Auto-generated **Swagger/OpenAPI** docs with **drf-spectacular**.
+* Accessible at `/api/docs/`.
 
----
+### 4. Performance
 
-### 🧩 Backend Development Concepts
-- **Database Design** – Relational modeling for products, orders, vendors, and users  
-- **Asynchronous Programming** – Celery with RabbitMQ for background tasks  
-- **Caching Strategies** – Redis to optimize performance and response times  
-- **Authentication & Authorization** – JWT tokens and role-based access control  
-- **Scalability** – Modular Django apps (accounts, products, orders, cart, vendors, wishlist, payments)  
+* Query optimization with `select_related` to prevent N+1 issues.
+* Database indexes on frequently queried fields (`price`, `created_at`, `sku`).
+* PostgreSQL trigram indexes for text search (advanced).
 
 ---
 
-## 🏗 System Architecture
+## 🛠️ Tech Stack
 
-flowchart TD
-    subgraph Client
-        FE[Frontend / API Consumers]
-    end
-
-    subgraph Backend[Django + DRF]
-        ACC[Accounts App]
-        PROD[Products App]
-        CART[Cart App]
-        ORD[Orders App]
-        VEND[Vendors App]
-        WISH[Wishlist App]
-        PAY[Payments App]
-    end
-
-    subgraph Services
-        CEL[Celery Workers]
-        MQ[RabbitMQ Broker]
-        REDIS[Redis Cache]
-    end
-
-    subgraph Infrastructure
-        DB[(MySQL/PostgreSQL Database)]
-        STRIPE[Stripe Payment API]
-        DOCKER[Docker Containers]
-    end
-
-    FE --> ACC
-    FE --> PROD
-    FE --> CART
-    FE --> ORD
-    FE --> VEND
-    FE --> WISH
-    FE --> PAY
-
-    ACC --> DB
-    PROD --> DB
-    CART --> DB
-    ORD --> DB
-    VEND --> DB
-    WISH --> DB
-    PAY --> DB
-
-    ORD --> CEL
-    CEL --> MQ
-    CEL --> DB
-
-    PAY --> STRIPE
-
-    Backend --> REDIS
-    Backend --> DOCKER
-````
+* **Backend Framework**: Django + Django REST Framework (DRF)
+* **Database**: PostgreSQL
+* **Authentication**: JSON Web Tokens (JWT via `djangorestframework-simplejwt`)
+* **Filtering**: django-filter
+* **API Documentation**: drf-spectacular (OpenAPI 3)
+* **Deployment**: Docker + docker-compose
 
 ---
 
-## 🗄 Database Design (ERD)
+## 📂 Project Structure
 
-erDiagram
-    USERS ||--o{ ORDERS : places
-    USERS ||--o{ CART : has
-    USERS ||--o{ WISHLIST : saves
-    USERS ||--o{ VENDORS : owns
-
-    VENDORS ||--o{ PRODUCTS : manages
-    PRODUCTS ||--o{ CARTITEMS : contains
-    PRODUCTS ||--o{ WISHLIST : included
-    PRODUCTS ||--o{ ORDERITEMS : part_of
-
-    ORDERS ||--o{ ORDERITEMS : contains
-    ORDERS ||--o{ PAYMENTS : processed_by
-
-    CART ||--o{ CARTITEMS : contains
-
-    USERS {
-        int id PK
-        string username
-        string email
-        string password
-    }
-
-    VENDORS {
-        int id PK
-        string vendor_name
-        int user_id FK
-    }
-
-    PRODUCTS {
-        int id PK
-        string name
-        text description
-        float price
-        int stock_quantity
-        int vendor_id FK
-    }
-
-    CART {
-        int id PK
-        int user_id FK
-    }
-
-    CARTITEMS {
-        int id PK
-        int cart_id FK
-        int product_id FK
-        int quantity
-    }
-
-    ORDERS {
-        int id PK
-        int user_id FK
-        datetime created_date
-        string status
-    }
-
-    ORDERITEMS {
-        int id PK
-        int order_id FK
-        int product_id FK
-        int quantity
-        float price
-    }
-
-    PAYMENTS {
-        int id PK
-        int order_id FK
-        string payment_method
-        string status
-        datetime paid_at
-    }
-
-    WISHLIST {
-        int id PK
-        int user_id FK
-        int product_id FK
-    }
+```
+alx-project-nexus/
+├── README.md
+├── requirements.txt
+├── docker-compose.yml
+├── Dockerfile
+├── manage.py
+├── config/                     # Django project settings
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── apps/
+│   ├── accounts/               # custom user & JWT auth
+│   └── products/               # product & category APIs
+└── tests/                      # test suite
 ```
 
 ---
 
-## 🚧 Challenges & Solutions
+## ⚙️ Setup & Installation
 
-* **Database schema complexity** → solved by normalization & clear relationships
-* **Long-running tasks (e.g., emails, order confirmations)** → solved with **Celery + RabbitMQ**
-* **Performance optimization** → solved with **Redis caching & query optimization**
-* **Scalable authentication & roles** → solved with **JWT + DRF permissions**
-
----
-
-## 📘 Best Practices & Takeaways
-
-* Designed with **REST API standards** & versioning
-* Built modular **Django apps** for maintainability
-* Used **environment variables** for secure configuration
-* Applied **Test-Driven Development (TDD)** for reliability
-* Automated deployments with **CI/CD pipelines**
-* Learned to prioritize **scalability, security, and maintainability**
-
----
-
-## 📂 Repository Setup
-
-1. Create repository: **`alx-project-nexus`**
-2. Add this `README.md` file with structured documentation
-3. Commit and push changes:
+### 1. Clone Repository
 
 ```bash
-git add README.md
-git commit -m "Add backend documentation for E-commerce Django API"
-git push origin main
+git clone https://github.com/<your-username>/alx-project-nexus.git
+cd alx-project-nexus
+```
+
+### 2. Create & Activate Virtual Environment
+
+```bash
+python3 -m venv venv
+source venv/bin/activate   # Linux/Mac
+venv\Scripts\activate      # Windows
+```
+
+### 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Environment Variables
+
+Create a `.env` file (use `.env.example` as reference):
+
+```
+SECRET_KEY=your_secret_key
+DEBUG=True
+POSTGRES_DB=ecommerce_db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_HOST=db
+POSTGRES_PORT=5432
+```
+
+### 5. Run Migrations
+
+```bash
+python manage.py migrate
+```
+
+### 6. Start Development Server
+
+```bash
+python manage.py runserver
+```
+
+Access API at: `http://127.0.0.1:8000/api/`
+
+---
+
+## 🐳 Run with Docker
+
+### Build & Start Services
+
+```bash
+docker-compose up --build
+```
+
+API will be available at: `http://localhost:8000/api/`
+
+---
+
+## 🔑 Authentication (JWT)
+
+* **Obtain token**
+
+```http
+POST /api/auth/token/
+{
+  "username": "testuser",
+  "password": "password123"
+}
+```
+
+* **Refresh token**
+
+```http
+POST /api/auth/token/refresh/
+{
+  "refresh": "<refresh_token>"
+}
+```
+
+Use the `access` token in the `Authorization` header:
+
+```
+Authorization: Bearer <access_token>
 ```
 
 ---
 
-## 📚 References
+## 📘 API Endpoints
 
-* [Django Documentation](https://docs.djangoproject.com/)
-* [Django REST Framework](https://www.django-rest-framework.org/)
-* [Celery](https://docs.celeryq.dev/)
-* [Redis](https://redis.io/documentation)
-* [Docker](https://docs.docker.com/)
-* [12-Factor App Principles](https://12factor.net/)
+### Products
 
+* `GET /api/products/` — List products (supports filtering, sorting, pagination)
+* `POST /api/products/` — Create new product (JWT required)
+* `GET /api/products/{id}/` — Get product by ID
+* `PUT /api/products/{id}/` — Update product (JWT required)
+* `DELETE /api/products/{id}/` — Delete product (JWT required)
+
+### Categories
+
+* `GET /api/categories/` — List categories
+* `POST /api/categories/` — Create new category (JWT required)
+
+### Auth
+
+* `POST /api/auth/token/` — Get JWT tokens
+* `POST /api/auth/token/refresh/` — Refresh JWT
+
+### Docs
+
+* `GET /api/docs/` — Swagger UI docs
+* `GET /api/schema/` — OpenAPI schema (JSON)
+
+---
+
+## 📊 Filtering, Sorting, Pagination
+
+Examples:
+
+```bash
+# Filter by category ID
+GET /api/products/?category=2
+
+# Price range filter
+GET /api/products/?min_price=20&max_price=100
+
+# Sort by price ascending
+GET /api/products/?ordering=price
+
+# Sort by price descending
+GET /api/products/?ordering=-price
+
+# Paginate results
+GET /api/products/?page=2&page_size=10
+```
+
+---
+
+## 🛠️ Database Optimization
+
+* Indexes added on `price`, `sku`, `created_at`, `name`.
+* Use `select_related('category')` to optimize joins.
+* PostgreSQL trigram index enabled for product search (advanced).
+
+```sql
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE INDEX product_name_trgm_idx 
+ON apps_products_product USING gin (name gin_trgm_ops);
+```
+
+---
+
+## ✅ Testing
+
+Run tests with:
+
+```bash
+python manage.py test
+```
+
+Sample test:
+
+```py
+from django.urls import reverse
+from rest_framework.test import APITestCase
+from apps.products.models import Category, Product
+
+class ProductListTests(APITestCase):
+    def setUp(self):
+        cat = Category.objects.create(name='Shoes', slug='shoes')
+        for i in range(10):
+            Product.objects.create(name=f'Product {i}', sku=f'SKU{i}', price=10+i, category=cat)
+
+    def test_list_products(self):
+        url = reverse('product-list')
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('results', resp.json())
+```
+
+---
+
+## 📦 Deployment
+
+* Package app into Docker image
+* Deploy with Docker Compose or Kubernetes
+* Use managed PostgreSQL (e.g., AWS RDS, Railway, Render)
+* Run `python manage.py migrate --noinput`
+* Collect static files: `python manage.py collectstatic --noinput`
+* Serve via **gunicorn** or **uvicorn workers** for production
+
+---
+
+## 📝 Evaluation Criteria
+
+1. **Functionality**: CRUD APIs, filtering, sorting, pagination, auth
+2. **Code Quality**: Clean, maintainable, documented
+3. **User Experience**: Comprehensive API docs
+4. **Performance**: DB indexing, query optimization
+5. **Version Control**: Frequent, descriptive commits
+
+---
+
+## 📌 Commit Workflow Examples
+
+```
+feat: set up Django project with PostgreSQL
+feat: implement JWT authentication
+feat: add product APIs with filtering and pagination
+feat: integrate Swagger docs
+perf: add DB indexing for product queries
+docs: update README with setup instructions
+test: add integration tests for product APIs
+```
+
+---
+
+## 👨‍💻 Author
+
+**ProDev Final Exam — E-Commerce Backend**
+Developed by: *Ugochukwu Chukwuemeka*
