@@ -25,6 +25,7 @@ class Product(models.Model):
         Category, related_name="products", on_delete=models.PROTECT
     )
     name = models.CharField(max_length=255)
+    email = models.EmailField(blank=True, null=True)
     slug = models.SlugField(max_length=300, unique=True)
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, db_index=True)
