@@ -4,7 +4,7 @@ URL configuration for alx_project_nexus project.
 
 from django.contrib import admin
 from django.http import JsonResponse
-from django.urls import path, include
+from django.urls import path, include, re_path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -18,6 +18,8 @@ schema_view = get_schema_view(
         title="ALX Project Nexus API",
         default_version="v1",
         description="E-Commerce Backend API",
+        contact=openapi.Contact(email="you@example.com"),
+        license=openapi.License(name="MIT License"),
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
@@ -58,7 +60,7 @@ urlpatterns = [
     # Admin
     path("admin/", admin.site.urls),
 
-    # Authentication
+    # Authentication (JWT)
     path("api/auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 
@@ -68,10 +70,10 @@ urlpatterns = [
     path("api/orders/", include("orders.urls")),
 
     # Documentation
-    path(
-        "swagger(<format>\.json|\.yaml)",
+    re_path(
+        r'^swagger(?P<format>\.json|\.yaml)$',
         schema_view.without_ui(cache_timeout=0),
-        name="schema-json",
+        name='schema-json'
     ),
     path(
         "swagger/",
