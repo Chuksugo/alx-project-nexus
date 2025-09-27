@@ -89,10 +89,10 @@ WSGI_APPLICATION = "alx_project_nexus.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("POSTGRES_DB"),
-        "USER": config("POSTGRES_USER"),
-        "PASSWORD": config("POSTGRES_PASSWORD"),
-        "HOST": config("POSTGRES_HOST", default="localhost"),
+        "NAME": config("POSTGRES_DB", default="alx_project_nexus"),
+        "USER": config("POSTGRES_USER", default="postgres"),
+        "PASSWORD": config("POSTGRES_PASSWORD", default="postgres"),
+        "HOST": config("POSTGRES_HOST", default="postgres"),  # <-- change default
         "PORT": config("POSTGRES_PORT", default="5432"),
     }
 }
