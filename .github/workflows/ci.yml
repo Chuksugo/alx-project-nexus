@@ -11,12 +11,13 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
+      # PostgreSQL Service
       postgres:
         image: postgres:15
         env:
           POSTGRES_DB: alx_project_nexus
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_PASSWORD: "${{ secrets.POSTGRES_PASSWORD }}"
         ports:
           - 5432:5432
         options: >-
@@ -25,17 +26,18 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+      # Redis Service
       redis:
         image: redis:7
         ports:
           - 6379:6379
 
     steps:
-      # 1️⃣ Checkout the repo
+      # 1️⃣ Checkout the repository
       - uses: actions/checkout@v4
 
-      # 2️⃣ Setup Python
-      - name: Set up Python 3.11
+      # 2️⃣ Set up Python 3.11
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -46,19 +48,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 4️⃣ Wait for Postgres to be ready
+      # 4️⃣ Wait for PostgreSQL service to be ready
       - name: Wait for Postgres
         run: |
           until pg_isready -h postgres -p 5432 -U postgres; do sleep 1; done
 
-      # 5️⃣ Run migrations & tests
+      # 5️⃣ Run migrations and tests
       - name: Run migrations & tests
         env:
           POSTGRES_DB: alx_project_nexus
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_PASSWORD: "${{ secrets.POSTGRES_PASSWORD }}"
           POSTGRES_HOST: postgres
           POSTGRES_PORT: 5432
+          # Optional: Django settings overrides
+          DEBUG: "True"
         run: |
           python manage.py migrate --noinput
           python manage.py test --verbosity=2
