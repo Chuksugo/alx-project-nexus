@@ -1,25 +1,46 @@
-# Virtual environment
+# =========================
+# ENVIRONMENT
+# =========================
 venv/
 env/
 ENV/
+.venv/
 *.env
-*.venv
 
-# Django stuff
-db.sqlite3
+# =========================
+# PYTHON / DJANGO
+# =========================
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
 *.log
+db.sqlite3
 
-# Static & media
-/staticfiles/
-/media/
+# Django static/media (generated at runtime)
+staticfiles/
+media/
 
-# IDE
+# =========================
+# CELERY / RUNTIME FILES
+# =========================
+celerybeat-schedule
+celerybeat.pid
+
+# =========================
+# DOCKER / BUILD
+# =========================
+*.dockerignore
+
+# =========================
+# IDE / EDITORS
+# =========================
 .vscode/
 .idea/
 
-# Ignore crash dumps/logs
+# =========================
+# OS FILES
+# =========================
+.DS_Store
+Thumbs.db
 *.stackdump

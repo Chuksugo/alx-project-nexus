@@ -1,0 +1,55 @@
+services:
+  web:
+    build: .
+    command: gunicorn alx_project_nexus.wsgi:application --bind 0.0.0.0:8000 --workers 3
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:15
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+
+  redis:
+    image: redis:7
+    restart: always
+
+  celery:
+    build: .
+    command: celery -A alx_project_nexus worker -l info
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - db
+
+  celery-beat:
+    build: .
+    command: celery -A alx_project_nexus beat -l info
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - db
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
